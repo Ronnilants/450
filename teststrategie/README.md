@@ -130,6 +130,13 @@ Alle Testfälle wurden mit Java 21 tatsächlich ausgeführt (Eingaben per Konsol
 
 **Zusammenfassung:** 23 Testfälle, davon 11 OK, 6 Fehler, 5 Mängel, 1 offen.
 
+### Testcode
+
+[`BankTestDriver.java`](bank-software/src/test/java/ch/tbz/bank/software/BankTestDriver.java) – einfacher
+Testtreiber ohne Framework. Ausführen in der IDE (Rechtsklick → Run `main`).
+
+Resultat: **12 OK, 5 FEHLER**. Die Fehler sind die gefundenen Bugs (negative Beträge, NaN, EUR→CHF).
+
 ### White-Box-Testfälle (Methoden)
 
 | Klasse | Methode | Was wird getestet (Pfade / Zweige) |
