@@ -4,61 +4,68 @@ Quelle: [UEBUNGEN.md](https://gitlab.com/ch-tbz-it/Stud/m450/m450/-/blob/main/Un
 
 ---
 
-## Aufgabe 1 – Was wird wie in unserer Firma getestet?
+## Aufgabe 1 – Was wird wie bei SIX Group AG getestet?
 
-> ✏️ **Hinweis:** Die Antworten beschreiben ein typisches Software-Team in einem Lehrbetrieb.
-> Die mit ✏️ markierten Stellen an die eigene Firma anpassen.
+SIX betreibt die Finanzmarkt-Infrastruktur der Schweiz: die Börse (SIX Swiss Exchange), den Zahlungsverkehr zwischen
+den Banken (SIC, im Auftrag der SNB), Finanzinformationen und Banking Services. Ein Fehler betrifft direkt Banken und
+den ganzen Finanzplatz. Deshalb wird sehr gründlich und auf allen Levels getestet, und SIX untersteht der Aufsicht
+von FINMA/SNB.
+
+> ✏️ Die markierten Stellen beschreiben ein typisches Team bei SIX. Bitte an das eigene Team anpassen.
 
 ### Mit welchen Test Levels hatten wir bereits zu tun?
 
-| Test Level | Bei uns? | Wer | Beispiel |
-|---|---|---|---|
-| **Unit Test** | ✅ ja | Entwickler | JUnit-Tests für Service-Klassen, z.B. Berechnung von Preisen/Gebühren |
-| **Component Test** | ✅ ja | Entwickler | Mehrere Klassen zusammen, Datenbank wird mit Mockito gemockt |
-| **Integration Test** | ✅ teilweise | Entwickler | Spring-Boot-Tests mit echter Testdatenbank (Docker), REST-Aufrufe mit Postman |
-| **System Test** | ✅ ja | Tester / Fachbereich | Ganze Abläufe in der Testumgebung (TEST/INT) nach Testprotokoll |
-| **Acceptance Test (UAT)** | ✅ ja | Kunde / Product Owner | Abnahme der User Stories am Ende des Sprints bzw. vor dem Release |
+| Test Level | Wer | Beispiel bei SIX |
+|---|---|---|
+| **Unit Test** | Entwickler | JUnit-Tests z.B. für die Berechnung von Gebühren oder das Validieren einer Zahlungsnachricht |
+| **Component Test** | Entwickler | Service mit mehreren Klassen; Datenbank und Schnittstellen zu anderen Systemen werden gemockt |
+| **Integration Test** | Entwickler / Test-Team | Zusammenspiel mit Datenbank, Message Queues und Schnittstellen zu anderen SIX-Systemen bzw. Banken |
+| **System Test** | Test-Team / QA | Ganze Abläufe in einer produktionsnahen Testumgebung, inkl. **Performance-/Lasttests** (viele Börsenaufträge oder Zahlungen gleichzeitig) und **Security-Tests** |
+| **Acceptance Test (UAT)** | Fachbereich / Kunden (Banken) | Fachbereich nimmt neue Funktionen ab; bei Änderungen an Schnittstellen testen teilnehmende Banken in einer Testumgebung mit |
 
 ### Wann werden Tests ausgeführt?
 
 * **Lokal beim Entwickeln:** Unit Tests in der IDE vor jedem Commit.
-* **Bei jedem Push / Merge Request:** CI-Pipeline (z.B. GitLab CI / GitHub Actions / Jenkins ✏️) führt Build,
-  Unit-, Component- und Integration-Tests aus. Schlägt ein Test fehl, kann nicht gemergt werden.
-* **Nach dem Deployment auf die Testumgebung:** Manuelle System- und Regressionstests.
-* **Vor dem Release:** Abnahmetest durch den Kunden/Product Owner, danach Deployment auf Produktion.
-* **Nach dem Release:** Smoke Test auf Produktion (Login, wichtigste Funktion).
+* **Bei jedem Pull/Merge Request:** CI-Pipeline (✏️ z.B. Jenkins / GitLab CI) führt Build, Unit-, Component- und
+  Integration-Tests aus, dazu Code-Analyse (✏️ z.B. SonarQube). Schlägt ein Test fehl, wird nicht gemergt.
+* **Nach dem Deployment auf die Testumgebungen** (✏️ z.B. DEV → TEST → Abnahme): System-, Regressions-,
+  Performance- und Security-Tests.
+* **Vor dem Release:** Abnahme durch den Fachbereich. Das Release läuft über einen geregelten
+  **Change-Management-Prozess** (Freigabe nötig, oft in fixen Wartungsfenstern, z.B. am Wochenende).
+* **Nach dem Release:** Smoke Tests und Monitoring der Produktion.
 
 ### Haben wir dedizierte Testing- oder QA-Teams?
 
-✏️ **Nein, kein eigenes QA-Team.** Die Entwickler sind für Unit-, Component- und Integration-Tests selbst verantwortlich.
-System- und Abnahmetests macht der Fachbereich bzw. der Product Owner. Zusätzlich gibt es **Code Reviews**
-(4-Augen-Prinzip) bei jedem Merge Request.
+**Ja.** Als grosse Firma mit kritischer Infrastruktur hat SIX neben den Entwicklern auch Tester bzw. QA-Spezialisten
+und eigene Testumgebungen. ✏️ Je nach Team sind die Tester direkt im agilen Team (Scrum) oder in einem separaten Test-Team.
 
-*Vergleich:* Grössere Firmen (Banken, Versicherungen) haben oft ein eigenes QA-Team, das System- und Integrationstests
-übernimmt und Testfälle in einem Tool wie Jira/Xray verwaltet.
+* **Entwickler:** Unit-, Component- und Integration-Tests, Code Reviews (4-Augen-Prinzip)
+* **Tester/QA:** System-, Regressions- und Performance-Tests, oft automatisiert
+* **Security-Team:** Security- und Penetrationstests
+* **Fachbereich/Kunden:** Abnahmetests
 
 ### Wie sieht unser Testing Life Cycle aus?
 
 ```
-Anforderung (User Story + Akzeptanzkriterien)
+Anforderung (User Story + Akzeptanzkriterien, ggf. regulatorische Vorgaben)
         │
         ▼
-Testplanung ── Welche Tests auf welchem Level? (in der Sprint-Planung)
+Testplanung ── Welche Tests auf welchem Level? Risiko-Einschätzung
         │
         ▼
 Entwicklung + Unit/Component Tests (Entwickler)
         │
         ▼
-Merge Request ── Code Review + CI-Pipeline (automatische Tests)
+Pull Request ── Code Review + CI-Pipeline (automatische Tests, Code-Analyse)
         │
         ▼
-Deployment Testumgebung ── System- und Regressionstests
+Testumgebungen ── Integration-, System-, Regressions-, Performance-, Security-Tests (QA)
         │
         ▼
-Abnahmetest (UAT) durch Kunde / PO
+Abnahmetest (UAT) durch Fachbereich / Kunden
         │
         ▼
-Release Produktion ── Smoke Test, Monitoring
+Change-Freigabe ──► Release Produktion (Wartungsfenster) ── Smoke Test, Monitoring
         │
         ▼
 Gefundene Bugs ──► Ticket ──► zurück in die Entwicklung (neuer Test, der den Bug abdeckt)
@@ -66,6 +73,7 @@ Gefundene Bugs ──► Ticket ──► zurück in die Entwicklung (neuer Test
 
 Das entspricht dem klassischen **Software Testing Life Cycle (STLC)**:
 Anforderungsanalyse → Testplanung → Testfall-Erstellung → Testumgebung bereitstellen → Testdurchführung → Testabschluss.
+Bei SIX wird zusätzlich alles **dokumentiert** (Testprotokolle, Freigaben), damit es bei Audits nachweisbar ist.
 
 ---
 
