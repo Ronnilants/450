@@ -8,3 +8,4 @@ Lösungen zu den Aufgaben des Moduls 450 (TBZ).
 | Teststrategie | [teststrategie/](teststrategie/README.md) |
 | Testlevels | [testlevels/](testlevels/README.md) |
 | Unit Testing | [unit-testing/](unit-testing/README.md) |
+| Schnittstellen | [schnittstellen/](schnittstellen/README.md) |
